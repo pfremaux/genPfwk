@@ -1,0 +1,3 @@
+	def getList%s(numPage:Int) : List[%s] = {
+		%s.list().paginate(10).page(numPage)
+	}

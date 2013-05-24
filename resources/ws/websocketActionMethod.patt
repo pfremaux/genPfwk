@@ -1,0 +1,3 @@
+	def imp() = WebSocket.async[JsValue] { request  =>
+    	Impulsions.connexionWS()
+	}

@@ -1,0 +1,34 @@
+package controllers
+
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import models.Tache
+import play.api.data._
+import play.api.data.Forms._
+
+object %sApplication extends Controller {
+
+  val %sForm = Form(
+    "label" -> nonEmptyText)
+
+  def index = Action {
+    Tache.create("test")
+    Ok(views.html.index(Tache.all(), taskForm))
+  }
+
+  def taches = Action {
+    Ok(views.html.index(Tache.all(), taskForm))
+  }
+  def newTache = Action { implicit request =>
+    taskForm.bindFromRequest.fold(
+        errors => BadRequest(views.html.index(Tache.all(), taskForm)),
+        label => Tache.create(label)
+        )
+    Ok(views.html.index(Tache.all(), taskForm))
+  }
+  
+  def suppr(id: Long) = Action {
+    Tache.delete(id)
+    Ok(views.html.index(Tache.all(), taskForm))
+  }
+}

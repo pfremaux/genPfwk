@@ -1,0 +1,32 @@
+@(lst: List[%s], taskForm: Form[%s])
+@import helper._
+@main("Welcome to Play 2.1") {
+<table class="table table-striped">
+	<tr>%s</tr>
+     @form(routes.%sController.create) {
+     <tr>
+        %s
+        <td><input type="submit" value="Creer"></td>
+    }
+    </tr>
+    @lst.map { %s =>
+    <tr>
+    	%s
+        <td>
+        @form(routes.%sController.suppr(%s.id.get)) {
+            <input type="submit" value="Supprimer">
+        }
+        </td>
+    </tr>
+    }
+</table>
+<div class="pagination">
+  <ul>
+    <li class="disabled"><a href="#">Prev</a></li>
+    <li class="disabled"><a href="#">1</a></li>
+    <li class="actived"><a href="#">2</a></li>
+    <li class="actived"><a href="#">3</a></li>
+    <li class="actived"><a href="#">Next</a></li>
+  </ul>
+</div>
+}

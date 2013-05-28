@@ -1,6 +1,7 @@
 package creators
 
 import tools.Tools
+import creators.entities.Model
 
 object DbPatterns {
 
@@ -11,24 +12,23 @@ object DbPatterns {
         colonnes, entityName.toUpperCase(), entityName.toLowerCase())
   }
 
-  def createEntity(entityName: String, attributs: Map[String, String]): String = {
-    var nomEntite = entityName(0).toUpper + entityName.substring(1)
-    var listParam = attributs.keys.map(cle => cle + " : " + attributs(cle))
-    "\tcase class %s (%s)".format(nomEntite, listParam.mkString(", "))
+  def createEntityContent(entity:Model): String = {
+    var listParam = entity.attribs.keys.map(cle => cle + " : " + entity.attribs(cle))
+    "\tcase class %s (%s)".format(entity.nameFirstUpperCase, listParam.mkString(", "))
   }
 
-  def createParser(entityName: String, attributs: Map[String, String]): String = {
-    var nomParser = entityName(0).toLower + entityName.substring(1)
-    var nomEntite = entityName(0).toUpper + entityName.substring(1)
-    var listParam = attributs.keys.map(cle => cle + " : " + attributs(cle))
-    var rowParser = attributs.keys.map(cle => Patterns.rowParserPattern.format(attributs(cle), cle))
+  def createParser(entity:Model): String = {
+    var parserName = entity.nameFirstLowerCase
+    var entityName = entity.nameFirstUpperCase
+    var listParam = entity.attribs.keys.map(cle => cle + " : " + entity.attribs(cle))
+    var rowParser = entity.attribs.keys.map(cle => Patterns.rowParserPattern.format(entity.attribs(cle), cle))
 
     val parametres = "(" + listParam.mkString(", ") + ")"
-    val methode = "\tval %s = { %s map { case %s => %s(%s) } }".format(nomParser,
+    val methode = "\tval %s = { %s map { case %s => %s(%s) } }".format(parserName,
       rowParser.mkString(" ~ "),
-      attributs.keys.mkString(" ~ "),
-      nomEntite,
-      (Map("Some(id)" -> "Long") ++ attributs).filterKeys(s => !"id".equals(s)).keys.mkString(", "))
+      entity.attribs.keys.mkString(" ~ "),
+      entityName,
+      (Map("Some(id)" -> "Long") ++ entity.attribs).filterKeys(s => !"id".equals(s)).keys.mkString(", "))
     methode
   }
 

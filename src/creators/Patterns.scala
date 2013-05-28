@@ -3,6 +3,7 @@ package creators
 import scala.io.Source
 import tools.Tools
 import java.io.FileWriter
+import creators.entities.Model
 
 /**
  * Class statique contenant les constantes nécessaires à la création des fichiers.
@@ -61,9 +62,6 @@ class ClassCreator(name: String, hostingFile: ScalaFileConstructor) {
 
   def furthermore: ScalaFileConstructor = host
 
-  def asModel(): ModelClassCreator = {
-    new ModelClassCreator(name, host)
-  }
 
   def extending(extClassName: String): ClassCreator = {
     extendClass = extClassName
@@ -101,9 +99,6 @@ class ClassCreator(name: String, hostingFile: ScalaFileConstructor) {
   }
 
   def asCrudController(entityName: String, attributs: Map[String, String]): ClassCreator = {
-
-    //var listeCles = attributs.keys.map(s => s)
-    //println(listeCles)
     methodes = ControllersPattern.formValidatorCreator(entityName, attributs) ::
       ControllersPattern.indexCreator(entityName) ::
       ControllersPattern.newEntityCreator(entityName, attributs) :: 
@@ -112,11 +107,10 @@ class ClassCreator(name: String, hostingFile: ScalaFileConstructor) {
   }
 
   def withDBAccess(entityName: String, attributs: Map[String, String]): ClassCreator = {
-    //methodes = Patterns.getListPattern.format(entityName, entityName, entityName) :: methodes
     methodes = DbPatterns.createDeleteMethod(entityName) ::
       DbPatterns.creategetAllMethod(entityName, attributs) ::
       DbPatterns.createMethod(entityName, attributs) ::
-      DbPatterns.createParser(entityName, Map("id" -> "Long") ++ attributs) :: methodes
+      DbPatterns.createParser(new Model(entityName, Map("id" -> "Long") ++ attributs)) :: methodes
     this
   }
 
@@ -127,21 +121,6 @@ class ClassCreator(name: String, hostingFile: ScalaFileConstructor) {
 
 }
 
-///////////////////////////////////////////////
-
-class ModelClassCreator(name: String, hostingFile: ScalaFileConstructor) extends ClassCreator(name, hostingFile) {
-  override def withAttribut(attribut: String): ModelClassCreator = {
-    attributs = attribut :: attributs
-    this
-  }
-
-  override def getClassContent(): String = {
-    "rien"
-    //Patterns.modelDBPattern.format(className, attributs.mkString(", "));
-  }
-}
-
-//////////////////////////////////////////////
 
 class WebFileConstructor(name: String) {
   val fileName = name
